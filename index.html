@@ -1,7 +1,141 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#111827"><link rel="manifest" href="manifest.json"><title>RESET 66</title><style>
-:root{--bg:#090d16;--card:#141b2a;--soft:#1d2638;--txt:#f6f7fb;--muted:#9ba7bc;--accent:#8b5cf6;--good:#35d07f}*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#090d16,#101626);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.app{max-width:520px;margin:auto;padding:22px 16px 100px}.top{display:flex;justify-content:space-between;align-items:center}.brand{font-weight:900;letter-spacing:2px}.pill{background:var(--soft);padding:8px 12px;border-radius:999px;font-size:13px}.hero{padding:26px 4px 18px}.hero h1{font-size:34px;margin:8px 0}.muted{color:var(--muted)}.bar{height:12px;background:#222c40;border-radius:20px;overflow:hidden;margin:12px 0}.fill{height:100%;background:linear-gradient(90deg,var(--accent),#c084fc);width:1.5%}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat,.card{background:rgba(20,27,42,.94);border:1px solid #263149;border-radius:18px;padding:16px}.stat b{font-size:24px;display:block;margin-top:5px}.section{margin-top:22px}.section h2{font-size:18px}.quest{display:flex;align-items:center;gap:12px;margin:10px 0;background:var(--card);border:1px solid #263149;padding:14px;border-radius:16px}.quest.done{opacity:.65}.check{width:30px;height:30px;border-radius:10px;border:2px solid #56627a;background:transparent;color:white;font-weight:bold}.done .check{background:var(--good);border-color:var(--good)}.qtext{flex:1}.qtext b{display:block}.xp{color:#bca7ff;font-weight:700;font-size:13px}.boss{border:1px solid #7c5ce5;background:linear-gradient(135deg,#1a1831,#191f34)}button.reset{width:100%;margin-top:22px;padding:13px;border:0;border-radius:14px;background:#252e40;color:#d8deea}.footer{text-align:center;color:#68758c;font-size:12px;margin-top:28px}
-</style></head><body><main class="app"><div class="top"><div class="brand">RESET 66</div><div class="pill" id="dayPill">DAY 1 / 66</div></div><section class="hero"><div class="muted">YOUR NEXT VERSION</div><h1>今天也前進一點。</h1><div class="bar"><div class="fill" id="progress"></div></div><div class="muted" id="progressText">66 天旅程剛開始</div></section><div class="grid"><div class="stat"><span class="muted">LEVEL</span><b id="level">1</b></div><div class="stat"><span class="muted">TOTAL XP</span><b id="totalXp">0</b></div><div class="stat"><span class="muted">🔥 STREAK</span><b id="streak">0 天</b></div><div class="stat"><span class="muted">TODAY</span><b id="todayXp">0 / 100</b></div></div><section class="section"><h2>⚔️ 今日 Quest</h2><div id="quests"></div></section><section class="section"><div class="card boss"><b>👑 Week 1 Boss — 重新啟動</b><p class="muted">本週累積 400 XP，並完成至少 5 天。第一版先由你手動追蹤，下一版加入週統計與徽章。</p></div></section><button class="reset" onclick="newDay()">模擬進入下一天</button><div class="footer">資料只儲存在這台裝置的瀏覽器 • RESET 66 MVP</div></main><script>
-const base=[['🛠️','職涯技能','弱電 / 光纖 / AutoCAD 30 分鐘',30],['🏃','身體','走路或運動 30 分鐘',20],['🧹','生活','整理或處理拖延事項 15 分鐘',10],['❤️','家庭','30 分鐘專心陪伴家人',20],['💰','財務 Check','記帳 / 檢查支出 / 無衝動消費',20]];
-let s=JSON.parse(localStorage.getItem('reset66')||'{"day":1,"total":0,"streak":0,"done":[]}');function save(){localStorage.setItem('reset66',JSON.stringify(s))}function render(){let q=document.getElementById('quests');q.innerHTML='';let tx=0;base.forEach((x,i)=>{let d=s.done.includes(i);if(d)tx+=x[3];let el=document.createElement('div');el.className='quest '+(d?'done':'');el.innerHTML=`<button class="check">${d?'✓':''}</button><div class="qtext"><b>${x[0]} ${x[1]}</b><span class="muted">${x[2]}</span></div><span class="xp">+${x[3]} XP</span>`;el.onclick=()=>toggle(i);q.appendChild(el)});document.getElementById('todayXp').textContent=tx+' / 100';document.getElementById('totalXp').textContent=s.total+tx;document.getElementById('level').textContent=Math.floor((s.total+tx)/500)+1;document.getElementById('streak').textContent=s.streak+' 天';document.getElementById('dayPill').textContent=`DAY ${s.day} / 66`;document.getElementById('progress').style.width=(s.day/66*100)+'%';document.getElementById('progressText').textContent=`已完成 ${Math.max(0,s.day-1)} 天 · ${Math.round(s.day/66*100)}%`}
-function toggle(i){s.done.includes(i)?s.done=s.done.filter(v=>v!==i):s.done.push(i);save();render()}function newDay(){let earned=base.reduce((a,x,i)=>a+(s.done.includes(i)?x[3]:0),0);s.total+=earned;if(s.done.length>=3)s.streak++;else s.streak=0;s.day=Math.min(66,s.day+1);s.done=[];save();render()}render();if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
-</script></body></html>
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090d16">
+<link rel="manifest" href="manifest.json">
+<title>RESET 66</title>
+<style>
+:root{--bg:#080c14;--card:#121a29;--card2:#182235;--line:#27344e;--txt:#f7f8fb;--muted:#9cacC4;--accent:#9b6cff;--accent2:#55a7ff;--good:#39d98a;--warn:#ffb84d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% -10%,#20284c 0,transparent 34%),linear-gradient(180deg,#080c14,#0c1220);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif}
+button,input{font:inherit}.app{max-width:560px;margin:auto;padding:18px 16px 105px}.top{display:flex;align-items:center;justify-content:space-between}.brand{font-weight:950;letter-spacing:2.5px}.pill{padding:8px 12px;background:#1c273c;border:1px solid #2b3955;border-radius:999px;font-size:12px}
+.hero{padding:25px 4px 12px}.eyebrow{font-size:12px;color:#91a4c5;letter-spacing:1.3px}.hero h1{font-size:34px;line-height:1.12;margin:8px 0 16px}.bar{height:10px;background:#222e45;border-radius:99px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px}.subrow{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-top:8px}
+.levelcard{margin-top:12px;padding:16px;border-radius:20px;background:linear-gradient(135deg,#171b34,#142238);border:1px solid #30405d}.leveltop{display:flex;justify-content:space-between;align-items:end}.levelbig{font-size:28px;font-weight:900}.xpbar{height:7px;margin-top:10px;background:#28344b;border-radius:99px;overflow:hidden}.xpfill{height:100%;background:linear-gradient(90deg,#b66cff,#5e9cff)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px}.stat{padding:14px 12px;border-radius:17px;background:rgba(18,26,41,.96);border:1px solid var(--line)}.stat small{display:block;color:var(--muted);font-size:11px}.stat b{display:block;margin-top:5px;font-size:19px}
+.section{margin-top:22px}.sectionhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}.section h2{font-size:17px;margin:0}.mini{font-size:12px;color:var(--muted)}
+.quest{display:flex;gap:12px;align-items:center;margin:9px 0;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:17px;transition:.15s}.quest:active{transform:scale(.99)}.quest.done{border-color:#315b50;background:#10231f}.check{flex:0 0 31px;height:31px;border-radius:10px;border:2px solid #596984;background:transparent;color:white;font-weight:900}.done .check{background:var(--good);border-color:var(--good)}.qtext{flex:1;min-width:0}.qtext b{display:block;font-size:14px}.qtext span{display:block;color:var(--muted);font-size:12px;margin-top:3px}.xp{font-size:12px;color:#c3adff;font-weight:800}
+.health{display:grid;grid-template-columns:1fr 1fr;gap:9px}.healthbox{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:13px}.healthbox label{font-size:11px;color:var(--muted);display:block}.healthbox input{width:100%;border:0;outline:0;background:transparent;color:white;font-weight:800;font-size:18px;margin-top:5px}
+.boss{padding:16px;border-radius:19px;border:1px solid #7357d9;background:linear-gradient(135deg,#201a3b,#16243b)}.boss p{font-size:12px;color:var(--muted);line-height:1.55;margin:7px 0 0}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}.btn{border:0;border-radius:14px;padding:12px;background:#222d42;color:#e7ebf4}.btn.primary{background:linear-gradient(90deg,#7f5af0,#557df2);font-weight:800}.btn.danger{color:#ffc3c3}
+.nav{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(560px,100%);display:grid;grid-template-columns:repeat(4,1fr);padding:9px 12px calc(9px + env(safe-area-inset-bottom));background:rgba(8,12,20,.93);backdrop-filter:blur(16px);border-top:1px solid #202b40}.nav button{border:0;background:none;color:#74839c;font-size:11px;padding:5px}.nav button.active{color:white}.nav span{font-size:20px;display:block;margin-bottom:2px}
+.page{display:none}.page.active{display:block}.historyrow{padding:13px;border-bottom:1px solid #222e44;display:flex;justify-content:space-between}.badgegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.badge{padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--line);opacity:.45}.badge.unlocked{opacity:1;border-color:#6d5cc8}.badge b{display:block;margin-top:7px}.empty{color:var(--muted);text-align:center;padding:30px 5px}.footer{text-align:center;color:#62718a;font-size:11px;margin-top:22px}
+</style>
+</head>
+<body>
+<main class="app">
+<div class="top"><div class="brand">RESET 66</div><div class="pill" id="dayPill">DAY 1 / 66</div></div>
+
+<section id="today" class="page active">
+  <div class="hero">
+    <div class="eyebrow">YOUR NEXT VERSION</div><h1>今天，也讓角色升一點級。</h1>
+    <div class="bar"><div class="fill" id="journeyFill"></div></div>
+    <div class="subrow"><span id="journeyText"></span><span id="completeText"></span></div>
+  </div>
+  <div class="levelcard">
+    <div class="leveltop"><div><span class="eyebrow">LEVEL</span><div class="levelbig" id="level">1</div></div><div class="mini" id="levelXp"></div></div>
+    <div class="xpbar"><div class="xpfill" id="levelFill"></div></div>
+  </div>
+  <div class="grid">
+    <div class="stat"><small>🔥 STREAK</small><b id="streak">0 天</b></div>
+    <div class="stat"><small>TODAY XP</small><b id="todayXp">0</b></div>
+    <div class="stat"><small>TOTAL XP</small><b id="totalXp">0</b></div>
+  </div>
+  <section class="section"><div class="sectionhead"><h2>⚔️ Today's Quest</h2><span class="mini" id="questCount"></span></div><div id="quests"></div></section>
+  <section class="section"><div class="boss"><b>👑 Weekly Boss</b><p id="bossText"></p></div></section>
+  <div class="actions"><button class="btn" onclick="toggleLowMode()" id="lowModeBtn">😵 疲勞模式</button><button class="btn primary" onclick="finishDay()">完成今天 →</button></div>
+</section>
+
+<section id="health" class="page">
+  <div class="hero"><div class="eyebrow">HEALTH CHECK-IN</div><h1>身體數據，也算進旅程。</h1></div>
+  <div class="health">
+    <div class="healthbox"><label>👟 步數</label><input id="steps" inputmode="numeric" placeholder="0"></div>
+    <div class="healthbox"><label>🏃 運動分鐘</label><input id="exercise" inputmode="numeric" placeholder="0"></div>
+    <div class="healthbox"><label>⚖️ 體重 kg</label><input id="weight" inputmode="decimal" placeholder="--"></div>
+    <div class="healthbox"><label>📉 體脂 %</label><input id="fat" inputmode="decimal" placeholder="--"></div>
+    <div class="healthbox"><label>😴 睡眠小時</label><input id="sleep" inputmode="decimal" placeholder="--"></div>
+    <div class="healthbox"><label>❤️ 靜息心率</label><input id="rhr" inputmode="numeric" placeholder="--"></div>
+  </div>
+  <button class="btn primary" style="width:100%;margin-top:12px" onclick="saveHealth()">儲存今日健康資料</button>
+  <div class="footer">V2 先手動輸入；未來原生 iPhone 版可改接 Apple Health。</div>
+</section>
+
+<section id="progressPage" class="page">
+  <div class="hero"><div class="eyebrow">PROGRESS</div><h1>你不是重來，是正在累積。</h1></div>
+  <div class="grid"><div class="stat"><small>完成天數</small><b id="doneDays">0</b></div><div class="stat"><small>完成率</small><b id="rate">0%</b></div><div class="stat"><small>總 XP</small><b id="pTotal">0</b></div></div>
+  <section class="section"><h2>最近紀錄</h2><div id="history"></div></section>
+</section>
+
+<section id="awards" class="page">
+  <div class="hero"><div class="eyebrow">ACHIEVEMENTS</div><h1>每一段堅持，都留下徽章。</h1></div>
+  <div class="badgegrid" id="badges"></div>
+  <section class="section"><h2>資料備份</h2><div class="actions"><button class="btn" onclick="exportData()">匯出 JSON</button><label class="btn" style="text-align:center">匯入 JSON<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label></div></section>
+  <button class="btn danger" style="width:100%;margin-top:18px" onclick="resetAll()">重置所有資料</button>
+</section>
+</main>
+
+<nav class="nav">
+<button class="active" onclick="showPage('today',this)"><span>🏠</span>Today</button>
+<button onclick="showPage('health',this)"><span>❤️</span>Health</button>
+<button onclick="showPage('progressPage',this)"><span>📊</span>Progress</button>
+<button onclick="showPage('awards',this)"><span>🏆</span>Awards</button>
+</nav>
+
+<script>
+const defaultQuests=[
+{id:'career',icon:'🛠️',name:'職涯技能',desc:'弱電 / 光纖 / AutoCAD 30 分鐘',xp:30,core:true},
+{id:'body',icon:'🏃',name:'身體',desc:'走路或運動 30 分鐘',xp:20,core:true},
+{id:'life',icon:'🧹',name:'生活',desc:'整理或處理拖延事項 15 分鐘',xp:10,core:false},
+{id:'family',icon:'❤️',name:'家庭',desc:'30 分鐘專心陪伴家人',xp:20,core:true},
+{id:'money',icon:'💰',name:'財務 Check',desc:'記帳 / 檢查支出 / 無衝動消費',xp:20,core:false}
+];
+const key='reset66v2';
+let s=JSON.parse(localStorage.getItem(key)||'null')||{day:1,total:0,streak:0,done:[],history:[],health:{},low:false};
+function save(){localStorage.setItem(key,JSON.stringify(s))}
+function visibleQuests(){return s.low?defaultQuests.filter(q=>q.core):defaultQuests}
+function todayXP(){return defaultQuests.reduce((a,q)=>a+(s.done.includes(q.id)?q.xp:0),0)}
+function render(){
+ const qs=visibleQuests(),wrap=document.getElementById('quests');wrap.innerHTML='';
+ qs.forEach(q=>{const d=s.done.includes(q.id),el=document.createElement('div');el.className='quest '+(d?'done':'');el.innerHTML=`<button class="check">${d?'✓':''}</button><div class="qtext"><b>${q.icon} ${q.name}</b><span>${q.desc}</span></div><div class="xp">+${q.xp} XP</div>`;el.onclick=()=>toggleQuest(q.id);wrap.appendChild(el)});
+ const tx=todayXP(),all=s.total+tx,level=Math.floor(all/500)+1,inLevel=all%500;
+ document.getElementById('todayXp').textContent=tx+' / 100';document.getElementById('totalXp').textContent=all;
+ document.getElementById('level').textContent=level;document.getElementById('levelXp').textContent=`${inLevel} / 500 XP`;
+ document.getElementById('levelFill').style.width=(inLevel/500*100)+'%';document.getElementById('streak').textContent=s.streak+' 天';
+ document.getElementById('dayPill').textContent=`DAY ${s.day} / 66`;
+ document.getElementById('journeyFill').style.width=(Math.max(0,s.day-1)/66*100)+'%';
+ document.getElementById('journeyText').textContent=`旅程進度 ${Math.round(Math.max(0,s.day-1)/66*100)}%`;
+ document.getElementById('completeText').textContent=`完成 ${s.history.length} 天`;
+ document.getElementById('questCount').textContent=`${s.done.filter(id=>qs.some(q=>q.id===id)).length} / ${qs.length}`;
+ document.getElementById('bossText').textContent=`本週目標：累積 400 XP，並至少完成 5 天。現在先專注今天；RESET 66 會保留每天紀錄。`;
+ document.getElementById('lowModeBtn').textContent=s.low?'⚡ 回到正常模式':'😵 疲勞模式';
+ renderProgress();renderBadges();loadHealth();
+}
+function toggleQuest(id){s.done.includes(id)?s.done=s.done.filter(x=>x!==id):s.done.push(id);save();render()}
+function toggleLowMode(){s.low=!s.low;save();render()}
+function finishDay(){
+ if(s.day>66)return alert('66 天挑戰已完成！');
+ const earned=todayXP(),count=s.done.length,passed=s.low?count>=2:count>=3;
+ s.history.push({day:s.day,date:new Date().toLocaleDateString('zh-TW'),xp:earned,quests:[...s.done],passed,health:s.health[s.day]||null});
+ s.total+=earned;s.streak=passed?s.streak+1:0;s.day=Math.min(67,s.day+1);s.done=[];s.low=false;save();render();alert(passed?`Day ${s.day-1} 完成！+${earned} XP`:`Day ${s.day-1} 已記錄。明天繼續。`);
+}
+function saveHealth(){
+ s.health[s.day]={steps:v('steps'),exercise:v('exercise'),weight:v('weight'),fat:v('fat'),sleep:v('sleep'),rhr:v('rhr')};save();alert('今日健康資料已儲存');
+}
+function v(id){return document.getElementById(id).value}
+function loadHealth(){const h=s.health[s.day]||{};['steps','exercise','weight','fat','sleep','rhr'].forEach(id=>document.getElementById(id).value=h[id]||'')}
+function renderProgress(){
+ document.getElementById('doneDays').textContent=s.history.length;document.getElementById('rate').textContent=(s.history.length?Math.round(s.history.filter(x=>x.passed).length/s.history.length*100):0)+'%';document.getElementById('pTotal').textContent=s.total+todayXP();
+ const h=document.getElementById('history');h.innerHTML=s.history.length?'':'<div class="empty">完成第一天後，紀錄會出現在這裡。</div>';
+ [...s.history].reverse().slice(0,20).forEach(x=>{let el=document.createElement('div');el.className='historyrow';el.innerHTML=`<span>Day ${x.day} · ${x.date}</span><b>${x.passed?'✓ ':''}+${x.xp} XP</b>`;h.appendChild(el)})
+}
+function renderBadges(){
+ const defs=[[7,'重新啟動','完成 7 天'],[14,'穩定輸出','完成 14 天'],[30,'習慣建立','完成 30 天'],[45,'技能進化','完成 45 天'],[66,'RESET 66','完成整個旅程']];
+ const b=document.getElementById('badges');b.innerHTML='';defs.forEach(([n,name,desc])=>{let u=s.history.length>=n,el=document.createElement('div');el.className='badge '+(u?'unlocked':'');el.innerHTML=`<span>${u?'🏆':'🔒'}</span><b>${name}</b><span class="mini">${desc}</span>`;b.appendChild(el)})
+}
+function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+function exportData(){const blob=new Blob([JSON.stringify(s,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='reset66-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{s=JSON.parse(r.result);save();render();alert('資料已匯入')}catch{alert('檔案格式不正確')}};r.readAsText(f)}
+function resetAll(){if(confirm('確定要清除 RESET 66 的所有紀錄嗎？')){localStorage.removeItem(key);location.reload()}}
+render();if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
+</script>
+</body></html>
